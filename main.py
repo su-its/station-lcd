@@ -51,6 +51,6 @@ canvas = tkinter.Canvas(root, highlightthickness = 0)
 canvas.place(x = 0, y = 0, w = W_WIDTH, h = W_HEIGHT)
 image_bgr = None
 
-box.append(Box("image", 0, 0, 0, W_WIDTH, W_HEIGHT, "./assets/bg.jpg", None, None))
+box.append(Box("image", 0, 0, 0, W_WIDTH, W_HEIGHT, "./assets/bg.png", None, None))
 draw()
 root.mainloop()
