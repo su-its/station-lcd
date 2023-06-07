@@ -35,12 +35,12 @@ def drawAnalogClock(image_bgr):
     # 時針
     x2 = x1 + 50 * math.sin(dt.hour * math.pi / 6 + dt.minute * math.pi / 360)
     y2 = y1 - 50 * math.cos(dt.hour * math.pi / 6 + dt.minute * math.pi / 360)
-    image_bgr = cv2.line(image_bgr, pt1 = (int(x1), int(y1)), pt2 = (int(x2), int(y2)), color = (255, 255, 255), thickness = 10, lineType = cv2.LINE_4, shift = 0)
+    image_bgr = cv2.line(image_bgr, pt1 = (int(x1), int(y1)), pt2 = (int(x2), int(y2)), color = (255, 255, 255), thickness = 10, lineType = cv2.LINE_AA, shift = 0)
     # 分針
     x2 = x1 + 90 * math.sin(dt.minute * math.pi / 30 + dt.second * math.pi / 1800)
     y2 = y1 - 90 * math.cos(dt.minute * math.pi / 30 + dt.second * math.pi / 1800)
-    image_bgr = cv2.line(image_bgr, pt1 = (int(x1), int(y1)), pt2 = (int(x2), int(y2)), color = (0, 0, 0), thickness = 8, lineType = cv2.LINE_4, shift = 0)
-    image_bgr = cv2.line(image_bgr, pt1 = (int(x1), int(y1)), pt2 = (int(x2), int(y2)), color = (255, 255, 255), thickness = 6, lineType = cv2.LINE_4, shift = 0)
+    image_bgr = cv2.line(image_bgr, pt1 = (int(x1), int(y1)), pt2 = (int(x2), int(y2)), color = (0, 0, 0), thickness = 8, lineType = cv2.LINE_AA, shift = 0)
+    image_bgr = cv2.line(image_bgr, pt1 = (int(x1), int(y1)), pt2 = (int(x2), int(y2)), color = (255, 255, 255), thickness = 6, lineType = cv2.LINE_AA, shift = 0)
     return image_bgr
 
 def generateImageTk(box):
