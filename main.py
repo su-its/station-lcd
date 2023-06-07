@@ -1,3 +1,5 @@
+import datetime
+import math
 import tkinter
 import cv2
 import numpy as np
@@ -16,10 +18,30 @@ class Box:
         self.font = font
         self.color = color
 
-def draw():
+def loop():
+    global dt
+    dt = datetime.datetime.now()
+    update()
+    root.after(1000, loop)
+
+def update():
     global image_tk, canvas
     image_tk = generateImageTk(box)
     canvas.create_image(0, 0, image = image_tk, anchor = "nw")
+
+def drawAnalogClock(image_bgr):
+    x1 = 147.5
+    y1 = 152.5
+    # 時針
+    x2 = x1 + 50 * math.sin(dt.hour * math.pi / 6 + dt.minute * math.pi / 360)
+    y2 = y1 - 50 * math.cos(dt.hour * math.pi / 6 + dt.minute * math.pi / 360)
+    image_bgr = cv2.line(image_bgr, pt1 = (int(x1), int(y1)), pt2 = (int(x2), int(y2)), color = (255, 255, 255), thickness = 10, lineType = cv2.LINE_4, shift = 0)
+    # 分針
+    x2 = x1 + 90 * math.sin(dt.minute * math.pi / 30 + dt.second * math.pi / 1800)
+    y2 = y1 - 90 * math.cos(dt.minute * math.pi / 30 + dt.second * math.pi / 1800)
+    image_bgr = cv2.line(image_bgr, pt1 = (int(x1), int(y1)), pt2 = (int(x2), int(y2)), color = (0, 0, 0), thickness = 8, lineType = cv2.LINE_4, shift = 0)
+    image_bgr = cv2.line(image_bgr, pt1 = (int(x1), int(y1)), pt2 = (int(x2), int(y2)), color = (255, 255, 255), thickness = 6, lineType = cv2.LINE_4, shift = 0)
+    return image_bgr
 
 def generateImageTk(box):
     global image_bgr
@@ -32,6 +54,7 @@ def generateImageTk(box):
             put_image = cv2.imread(box[i].data)
             put_image = cv2.resize(put_image, (box[i].w, box[i].h))
             image_bgr[box[i].y:box[i].y + put_image.shape[0], box[i].x:box[i].x + put_image.shape[1]] = put_image
+    drawAnalogClock(image_bgr)
     image_rgb = cv2.cvtColor(image_bgr, cv2.COLOR_BGR2RGB)
     image_pil = Image.fromarray(image_rgb)
     image_tk = ImageTk.PhotoImage(image_pil)
@@ -41,6 +64,7 @@ W_TITLE = "Station LCD"
 W_WIDTH = 800
 W_HEIGHT = 465
 
+dt = datetime.datetime.now()
 root = tkinter.Tk()
 root.geometry(str(W_WIDTH) + "x" + str(W_HEIGHT))
 root.title(W_TITLE)
@@ -52,5 +76,5 @@ canvas.place(x = 0, y = 0, w = W_WIDTH, h = W_HEIGHT)
 image_bgr = None
 
 box.append(Box("image", 0, 0, 0, W_WIDTH, W_HEIGHT, "./assets/bg.png", None, None))
-draw()
+loop()
 root.mainloop()
