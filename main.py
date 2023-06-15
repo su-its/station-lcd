@@ -73,6 +73,7 @@ root = tkinter.Tk()
 root.geometry(str(W_WIDTH) + "x" + str(W_HEIGHT))
 root.title(W_TITLE)
 root.resizable(0, 0)
+root.attributes("-topmost", True)
 
 box = []
 canvas = tkinter.Canvas(root, highlightthickness = 0)
