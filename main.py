@@ -50,12 +50,14 @@ def drawAnalogClock(image_bgr):
 def generateImageTk(box):
     global image_bgr
     image_bgr = 255 * np.ones((W_HEIGHT, W_WIDTH, 3), np.uint8)
+    image_bgr = cv2.rectangle(image_bgr, (0, 0), (W_WIDTH, W_HEIGHT), (31, 33, 32), thickness = -1)
+    image_bgr = cv2.rectangle(image_bgr, (27, 22), (772, 442), (255, 255, 255), thickness = -1)
     for i in range(len(box)):
         if box[i].kind == "text":
             box[i].w, box[i].h = getTextSize(image_bgr, box[i].data, box[i].font)
             image_bgr = drawText(image_bgr, box[i].data, box[i].x, box[i].y, box[i].font, box[i].color)
         if box[i].kind == "image":
-            put_image = cv2.imread(box[i].data)
+            put_image = box[i].data
             put_image = cv2.resize(put_image, (box[i].w, box[i].h))
             image_bgr[box[i].y:box[i].y + put_image.shape[0], box[i].x:box[i].x + put_image.shape[1]] = put_image
     drawAnalogClock(image_bgr)
@@ -80,6 +82,9 @@ canvas = tkinter.Canvas(root, highlightthickness = 0)
 canvas.place(x = 0, y = 0, w = W_WIDTH, h = W_HEIGHT)
 image_bgr = None
 
-box.append(Box("image", 0, 0, 0, W_WIDTH, W_HEIGHT, "./assets/bg.png", None, None))
+box.append(Box("image", 0, 32, 28, 231, 255, cv2.imread("./assets/clock.png"), None, None))
+box.append(Box("image", 0, 267, 28, 501, 255, cv2.imread("./assets/title.png"), None, None))
+box.append(Box("image", 0, 32, 288, 736, 72, cv2.imread("./assets/message.png"), None, None))
+box.append(Box("image", 0, 32, 365, 736, 72, cv2.imread("./assets/message.png"), None, None))
 loop()
 root.mainloop()
