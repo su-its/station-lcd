@@ -47,6 +47,22 @@ def drawAnalogClock(image_bgr):
     image_bgr = cv2.line(image_bgr, pt1 = (int(x1), int(y1)), pt2 = (int(x2), int(y2)), color = (158, 158, 158), thickness = 2, lineType = cv2.LINE_AA, shift = 0)
     return image_bgr
 
+def getTextSize(img, text, font):
+    font = ImageFont.truetype(font[0], font[1])
+    img = Image.fromarray(img)
+    draw = ImageDraw.Draw(img)
+    bbox = draw.textbbox((0, 0), text, font)
+    return bbox[1], bbox[3]
+
+def drawText(img, text, x, y, font, color):
+    font = ImageFont.truetype(font[0], font[1])
+    img = Image.fromarray(img)
+    draw = ImageDraw.Draw(img)
+    color_bgr = (color[2], color[1], color[0])
+    draw.text((x, y), text, font = font, fill = color_bgr)
+    img = np.array(img)
+    return img
+
 def generateImageTk(box):
     global image_bgr
     image_bgr = 255 * np.ones((W_HEIGHT, W_WIDTH, 3), np.uint8)
@@ -86,5 +102,6 @@ box.append(Box("image", 0, 32, 28, 231, 255, cv2.imread("./assets/clock.png"), N
 box.append(Box("image", 0, 267, 28, 501, 255, cv2.imread("./assets/title.png"), None, None))
 box.append(Box("image", 0, 32, 288, 736, 72, cv2.imread("./assets/message.png"), None, None))
 box.append(Box("image", 0, 32, 365, 736, 72, cv2.imread("./assets/message.png"), None, None))
+box.append(Box("text", 0, 45, 379, None, None, "ここにテキストを入力", ["./assets/Kosugi-Regular.ttf", 44, 0], (255, 136, 0)))
 loop()
 root.mainloop()
