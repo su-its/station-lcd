@@ -47,6 +47,14 @@ def drawAnalogClock(image_bgr):
     image_bgr = cv2.line(image_bgr, pt1 = (int(x1), int(y1)), pt2 = (int(x2), int(y2)), color = (158, 158, 158), thickness = 2, lineType = cv2.LINE_AA, shift = 0)
     return image_bgr
 
+def drawInformation(image_bgr):
+    global length
+    message = "今日は、" + str(dt.year) + "年" + str(dt.month) + "月" + str(dt.day) + "日 (" + WEEKDAY[dt.weekday()] + ")"
+    if length != len(message):
+        length = len(message)
+    image_bgr = drawText(image_bgr, message, 45, 379, font, (255, 136, 0))
+    return image_bgr
+
 def getTextSize(img, text, font):
     font = ImageFont.truetype(font[0], font[1])
     img = Image.fromarray(img)
@@ -55,7 +63,6 @@ def getTextSize(img, text, font):
     return bbox[1], bbox[3]
 
 def drawText(img, text, x, y, font, color):
-    font = ImageFont.truetype(font[0], font[1])
     img = Image.fromarray(img)
     draw = ImageDraw.Draw(img)
     color_bgr = (color[2], color[1], color[0])
@@ -76,7 +83,8 @@ def generateImageTk(box):
             put_image = box[i].data
             put_image = cv2.resize(put_image, (box[i].w, box[i].h))
             image_bgr[box[i].y:box[i].y + put_image.shape[0], box[i].x:box[i].x + put_image.shape[1]] = put_image
-    drawAnalogClock(image_bgr)
+    image_bgr = drawAnalogClock(image_bgr)
+    image_bgr = drawInformation(image_bgr)
     image_rgb = cv2.cvtColor(image_bgr, cv2.COLOR_BGR2RGB)
     image_pil = Image.fromarray(image_rgb)
     image_tk = ImageTk.PhotoImage(image_pil)
@@ -85,8 +93,9 @@ def generateImageTk(box):
 W_TITLE = "Station LCD"
 W_WIDTH = 800
 W_HEIGHT = 465
+WEEKDAY = ["月", "火", "水", "木", "金", "土", "日"]
 
-dt = datetime.datetime.now()
+dt = None
 root = tkinter.Tk()
 root.geometry(str(W_WIDTH) + "x" + str(W_HEIGHT))
 root.title(W_TITLE)
@@ -97,11 +106,12 @@ box = []
 canvas = tkinter.Canvas(root, highlightthickness = 0)
 canvas.place(x = 0, y = 0, w = W_WIDTH, h = W_HEIGHT)
 image_bgr = None
+font = ImageFont.truetype("./assets/Kosugi-Regular.ttf", 42)
+length = None
 
 box.append(Box("image", 0, 32, 28, 231, 255, cv2.imread("./assets/clock.png"), None, None))
 box.append(Box("image", 0, 267, 28, 501, 255, cv2.imread("./assets/title.png"), None, None))
 box.append(Box("image", 0, 32, 288, 736, 72, cv2.imread("./assets/message.png"), None, None))
 box.append(Box("image", 0, 32, 365, 736, 72, cv2.imread("./assets/message.png"), None, None))
-box.append(Box("text", 0, 45, 379, None, None, "ここにテキストを入力", ["./assets/Kosugi-Regular.ttf", 44, 0], (255, 136, 0)))
 loop()
 root.mainloop()
