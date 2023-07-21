@@ -47,12 +47,23 @@ def drawAnalogClock(image_bgr):
     image_bgr = cv2.line(image_bgr, pt1 = (int(x1), int(y1)), pt2 = (int(x2), int(y2)), color = (158, 158, 158), thickness = 2, lineType = cv2.LINE_AA, shift = 0)
     return image_bgr
 
+def setInformation():
+    global information, information_length, information_id
+    information_id += 1
+    if information_id >= len(information):
+        information_id = 0
+    if information_id == 0:
+        information = "今日は、" + str(dt.year) + "年" + str(dt.month) + "月" + str(dt.day) + "日 (" + WEEKDAY[dt.weekday()] + ")"
+    information_length = len(information.encode())
+    return
+
 def drawInformation(image_bgr):
-    global length
-    message = "今日は、" + str(dt.year) + "年" + str(dt.month) + "月" + str(dt.day) + "日 (" + WEEKDAY[dt.weekday()] + ")"
-    if length != len(message):
-        length = len(message)
-    image_bgr = drawText(image_bgr, message, 45, 379, font, (255, 136, 0))
+    global information_length, information_x
+    information_x -= 12
+    if information_x < information_length * 19 * -1 or information_id == -1:
+        setInformation()
+        information_x = W_WIDTH
+    image_bgr = drawText(image_bgr, information, information_x, 379, font, (255, 136, 0))
     return image_bgr
 
 def getTextSize(img, text, font):
@@ -107,7 +118,11 @@ canvas = tkinter.Canvas(root, highlightthickness = 0)
 canvas.place(x = 0, y = 0, w = W_WIDTH, h = W_HEIGHT)
 image_bgr = None
 font = ImageFont.truetype("./assets/Kosugi-Regular.ttf", 42)
-length = None
+
+information = ""
+information_length = 0
+information_id = -1
+information_x = W_WIDTH
 
 box.append(Box("image", 0, 32, 28, 231, 255, cv2.imread("./assets/clock.png"), None, None))
 box.append(Box("image", 0, 267, 28, 501, 255, cv2.imread("./assets/title.png"), None, None))
