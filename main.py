@@ -50,17 +50,24 @@ def drawAnalogClock(image_bgr):
 def setInformation():
     global information, information_length, information_id
     information_id += 1
-    if information_id >= len(information):
+    if information_id >= len(INFORMATION_LIST):
         information_id = 0
-    if information_id == 0:
+    if INFORMATION_LIST[information_id] == "_datetime":
         information = "今日は、" + str(dt.year) + "年" + str(dt.month) + "月" + str(dt.day) + "日 (" + WEEKDAY[dt.weekday()] + ")"
+    elif INFORMATION_LIST[information_id] == "_garbage":
+        if WEEKDAY[dt.weekday()] == "月" or WEEKDAY[dt.weekday()] == "木":
+            information = "今日はゴミ収集日です! 室内のゴミ袋が満杯の場合、集積場に処分して下さい。収集時間は12:00～12:30です。"
+        else:
+            information = ""
+    else:
+        information = INFORMATION_LIST[information_id]
     information_length = len(information.encode())
     return
 
 def drawInformation(image_bgr):
     global information_length, information_x
     information_x -= 12
-    if information_x < information_length * 19 * -1 or information_id == -1:
+    if information_x < information_length * 19 * -1 or information_id == -1 or information_length <= 0:
         setInformation()
         information_x = W_WIDTH
     image_bgr = drawText(image_bgr, information, information_x, 379, font, (255, 136, 0))
@@ -84,8 +91,6 @@ def drawText(img, text, x, y, font, color):
 def generateImageTk(box):
     global image_bgr
     image_bgr = 255 * np.ones((W_HEIGHT, W_WIDTH, 3), np.uint8)
-    image_bgr = cv2.rectangle(image_bgr, (0, 0), (W_WIDTH, W_HEIGHT), (31, 33, 32), thickness = -1)
-    image_bgr = cv2.rectangle(image_bgr, (27, 22), (772, 442), (255, 255, 255), thickness = -1)
     for i in range(len(box)):
         if box[i].kind == "text":
             box[i].w, box[i].h = getTextSize(image_bgr, box[i].data, box[i].font)
@@ -96,6 +101,14 @@ def generateImageTk(box):
             image_bgr[box[i].y:box[i].y + put_image.shape[0], box[i].x:box[i].x + put_image.shape[1]] = put_image
     image_bgr = drawAnalogClock(image_bgr)
     image_bgr = drawInformation(image_bgr)
+    image_bgr = cv2.rectangle(image_bgr, (0, 0), (W_WIDTH, 27), COLOR_WHITE, thickness = -1)
+    image_bgr = cv2.rectangle(image_bgr, (0, 437), (W_WIDTH, W_HEIGHT), COLOR_WHITE, thickness = -1)
+    image_bgr = cv2.rectangle(image_bgr, (0, 0), (31, W_HEIGHT), COLOR_WHITE, thickness = -1)
+    image_bgr = cv2.rectangle(image_bgr, (768, 0), (W_WIDTH, W_HEIGHT), COLOR_WHITE, thickness = -1)
+    image_bgr = cv2.rectangle(image_bgr, (0, 0), (W_WIDTH, 22), COLOR_GRAY, thickness = -1)
+    image_bgr = cv2.rectangle(image_bgr, (0, 442), (W_WIDTH, W_HEIGHT), COLOR_GRAY, thickness = -1)
+    image_bgr = cv2.rectangle(image_bgr, (0, 0), (26, W_HEIGHT), COLOR_GRAY, thickness = -1)
+    image_bgr = cv2.rectangle(image_bgr, (773, 0), (W_WIDTH, W_HEIGHT), COLOR_GRAY, thickness = -1)
     image_rgb = cv2.cvtColor(image_bgr, cv2.COLOR_BGR2RGB)
     image_pil = Image.fromarray(image_rgb)
     image_tk = ImageTk.PhotoImage(image_pil)
@@ -105,6 +118,14 @@ W_TITLE = "Station LCD"
 W_WIDTH = 800
 W_HEIGHT = 465
 WEEKDAY = ["月", "火", "水", "木", "金", "土", "日"]
+COLOR_GRAY = (31, 33, 32)
+COLOR_WHITE = (255, 255, 255)
+
+INFORMATION_LIST = [
+    "_datetime",
+    "_garbage",
+    "本ソフトウェアのソースコードは、https://github.com/su-its/station-lcd で公開しています。"
+]
 
 dt = None
 root = tkinter.Tk()
